@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrôle PWM</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #sliderContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px;
+        }
+        #dutyCycleValue {
+            font-weight: bold;
+            margin-left: 10px;
+            color: #007bff;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        /* Changer le style du curseur */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 80%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+         width: 20px;
+            height: 20px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contrôle PWM en Temps Réel</h1>
+    <div id="sliderContainer">
+        <input type="range" id="dutyCycleSlider" min="0" max="100" value="50" oninput="updatePWM()">
+        <span id="dutyCycleValue">50%</span>
+    </div>
+    <p id="status">Déplacez le curseur pour modifier le PWM.</p>
+
+    <script>
+        const socket = io();
+        const statusElement = document.getElementById('status');
+        const slider = document.getElementById('dutyCycleSlider');
+        const valueDisplay = document.getElementById('dutyCycleValue');
+
+        // Met à jour la valeur affichée et envoie la nouvelle valeur PWM
+        function updatePWM() {
+            const dutyCycle = parseInt(slider.value, 10);
+            valueDisplay.textContent = `${dutyCycle}%`;
+
+            // Envoi immédiat de la nouvelle valeur PWM au serveur
+            socket.emit('set-pwm', dutyCycle);
+
+            // Afficher un message temporaire
+            statusElement.style.color = '#007bff';
+            statusElement.textContent = `Envoi de la valeur PWM : ${dutyCycle}%...`;
+        }
+
+        // Réception des mises à jour depuis le serveur
+        socket.on('pwm-updated', (message) => {
+            statusElement.style.color = 'green';
+            statusElement.textContent = message;
+        });
+
+        // Gestion des erreurs côté serveur
+        socket.on('pwm-error', (error) => {
+            statusElement.style.color = 'red';
+            statusElement.textContent = error;
+        });
+
+        // Gérer la déconnexion du serveur
+        socket.on('disconnect', () => {
+            statusElement.style.color = 'red';
+            statusElement.textContent = 'Connexion au serveur perdue. Reconnexion en cours...';
+        });
+
+        // Gérer la reconnexion au serveur
+        socket.on('connect', () => {
+            statusElement.style.color = 'green';
+            statusElement.textContent = 'Connecté au serveur.';
+        });
+    </script>
+</body>
+</html>
+
+
