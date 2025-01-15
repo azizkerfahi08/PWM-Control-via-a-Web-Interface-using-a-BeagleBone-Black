@@ -2,6 +2,8 @@
 This project, developed by Aziz Kerfahi and Mohamed Fedi Lafi, enables real-time control of a DC motor through Pulse Width Modulation (PWM) on a BeagleBone Black board. The project utilizes a web interface realized with nodejs to manage the PWM signals, allowing users to adjust the motor's speed and performance remotely and in real-time.
 
 ## Demo
+[![Watch the video]]([https://drive.google.com/file/d/FILE_ID/view)](https://drive.google.com/file/d/1PqAiEXiMGePAwho-xB1QobgTkYjSg9D8/view?usp=sharing)
+
 ## Required Tools and Software
 - **Real-Time Kernel** for more precise PWM control.
 - **Node.js** and **npm** to run the web server.
